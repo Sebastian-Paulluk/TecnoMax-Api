@@ -16,7 +16,7 @@ fabricanteController.obtenerFabricantes = obtenerFabricantes
 const obtenerFabricante = async (req, res) => {
     const id = req.params.id
     try {
-        const fabricante = await Fabricante.findById(id)
+        const fabricante = await Fabricante.findById(id).select('-__v')
         if (!fabricante) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`})
         }
@@ -30,16 +30,19 @@ fabricanteController.obtenerFabricante = obtenerFabricante
 
 const agregarFabricante = async (req, res) => {
     const { nombre, direccion, numeroContacto, pathImgPerfil } = req.body
+
     try {
-        const fabricante = await Fabricante.create({
+        const fabricante = new Fabricante({
             nombre,
             direccion,
             numeroContacto,
-            pathImgPerfil
+            pathImgPerfil,
         })
-        res.status(202).json(fabricante)
+        const nuevoFabricante = await fabricante.save()
+
+        res.status(200).json(nuevoFabricante)
     } catch (error) {
-       res.status(505).json({ error: 'Error al crear el fabricante.'})
+        res.status(505).json({ error: 'Error al crear el fabricante.'})
     }
 }
 fabricanteController.agregarFabricante = agregarFabricante

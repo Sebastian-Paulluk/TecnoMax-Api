@@ -1,4 +1,4 @@
-const Joi = require('joi')
+const Joi = require('joi');
 const dataMinLength = {
     nombre: 3,
     direccion: 5,
@@ -6,13 +6,12 @@ const dataMinLength = {
     pathImgPerfil: 5
 }
 
-const idSchema = Joi.number().integer().positive().required().messages({
-    'number.base': 'El ID debe ser un número.',
-    'number.empty': 'El ID no puede estar vacío.',
-    'number.integer': 'El ID debe ser un número entero.', 
-    'number.positive': 'El ID debe ser un número positivo.', 
+const idSchema = Joi.string().alphanum().required().messages({
+    'string.base': 'El ID debe ser una cadena de texto.',
+    'string.empty': 'El ID no puede estar vacío.',
+    'string.alphanum': 'El ID solo puede contener caracteres alfanuméricos.',
     'any.required': 'El ID es obligatorio.'
-})
+});
 
 const creationSchema = Joi.object({
     nombre: Joi.string().min(dataMinLength.nombre).required().messages({
@@ -48,4 +47,4 @@ const fabricanteSchema = {
     updateSchema
 }
 
-module.exports = fabricanteSchema
+module.exports = fabricanteSchema;

@@ -1,32 +1,32 @@
 const { Router } = require('express')
 const routes = Router()
 const fabricanteController = require('../controllers/fabricante.controller')
-const fabricanteSchemas = require('../schemas/fabricante.schema')
-const validateFabricante = require('../middlewares/fabricante.middleware')
+const validateId = require('../middlewares/empresa.middleware')
+const fabricanteSchema = require('../schemas/fabricante.schema')
 const schemasValidator = require('../middlewares/schemasValidate.middlewares')
 
 routes.get('/',
     fabricanteController.obtenerFabricantes)
 
 routes.get('/:id',
-    validateFabricante,
+    validateId,
     fabricanteController.obtenerFabricante)
 
 routes.post('/',
-    schemasValidator(fabricanteSchemas.creationSchema),
+    schemasValidator(fabricanteSchema.creationSchema),
     fabricanteController.agregarFabricante)
 
 routes.put('/:id', 
-    validateFabricante,
-    schemasValidator(fabricanteSchemas.updateSchema),
+    validateId,
+    schemasValidator(fabricanteSchema.updateSchema),
     fabricanteController.actualizarFabricante)
 
 routes.delete('/:id',
-    validateFabricante,
+    validateId,
     fabricanteController.borrarFabricante)
 
 routes.get('/:id/productos', 
-    validateFabricante,
+    validateId,
     fabricanteController.obtenerProductosDeFabricante)
 
 module.exports = routes
