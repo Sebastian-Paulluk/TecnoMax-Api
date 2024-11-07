@@ -49,39 +49,39 @@ fabricanteController.agregarFabricante = agregarFabricante
 
 
 const actualizarFabricante = async (req, res) => {
-    const id = req.params.id
-    const { nombre, direccion, numeroContacto, pathImgPerfil } = req.body
+    const id = req.params.id;
+    const datosActualizados = req.body;
+
     try {
-        const fabricante = await Fabricante.findByPk(id)
-        if (!fabricante) {
-            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`})
+        const fabricanteActualizado = await Fabricante.findByIdAndUpdate(
+            id,
+            datosActualizados,
+            { new: true, runValidators: true }
+        );
+
+        if (!fabricanteActualizado) {
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`});
         }
-        fabricante.nombre = nombre ?? fabricante.nombre
-        fabricante.direccion = direccion ?? fabricante.direccion
-        fabricante.numeroContacto = numeroContacto ?? fabricante.numeroContacto
-        fabricante.pathImgPerfil = pathImgPerfil ?? fabricante.pathImgPerfil
-        
-        await fabricante.save()
-        res.status(202).json(fabricante)
+
+        res.status(202).json(fabricanteActualizado);
     } catch (error) {
-        res.status(505).json({ error: 'Error al modificar el fabricante.'})
+        res.status(505).json({ error: 'Error al modificar el fabricante.'});
     }
 }
 fabricanteController.actualizarFabricante = actualizarFabricante
 
 
 const borrarFabricante = async (req, res) => {
-    const id = req.params.id
+    const id = req.params.id;
     try {
-        const fabricante = await Fabricante.findByPk(id)
-        if (!fabricante) {
+        const fabricanteEliminado = await Fabricante.findByIdAndDelete(id);
+        if (!fabricanteEliminado) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`})
         }
-
-        await fabricante.destroy()
-        res.status(200).json({ message: `Fabricante con ID ${id} eliminado con éxito.`})
+        res.status(200).json({ message: `Fabricante eliminado con éxito.`})
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar al fabricante.'})
+        console.log(error)
     }
 }
 fabricanteController.borrarFabricante = borrarFabricante
