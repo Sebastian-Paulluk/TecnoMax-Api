@@ -21,6 +21,6 @@ const fabricanteSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Producto'
     }]
-})
+}, { versionKey: false })
 
 module.exports = mongoose.model('Fabricante', fabricanteSchema);
