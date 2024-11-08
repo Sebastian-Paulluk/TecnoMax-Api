@@ -1,8 +1,10 @@
 const Fabricante = require('../models/fabricante.model')
+const Componente = require('../models/componente.model')
 
 async function seedDatabase() {
     try {
         await Fabricante.deleteMany({})
+        await Componente.deleteMany({})
 
         const fabricantes = await Fabricante.insertMany([
             {
@@ -23,6 +25,22 @@ async function seedDatabase() {
                 pathImgPerfil: 'ruta/a/la/imagen/samsung'
             }
         ])
+
+        const componentes = await Componente.insertMany(
+            [
+                {
+                nombre: 'Componente 1',
+                descripcion: 'Descripción del componente 1'
+                },
+                {
+                nombre: 'Componente 2',
+                descripcion: 'Descripción del componente 2'
+                },
+                {
+                nombre: 'Componente 3',
+                descripcion: 'Descripción del componente 3'
+                }
+            ])
 
         console.log('Base de datos poblada con éxito.')
     } catch(error) {
