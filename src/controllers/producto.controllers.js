@@ -75,8 +75,8 @@ const eliminarProducto = async (req, res) => {
 productoController.eliminarProducto = eliminarProducto;
 
 const crearProductoConFabricante =  async (req, res) => {
-    const { id } = req.params;
-    const { fabricanteIds } = req.body;
+    const  id  = req.params.id;
+    const fabricanteIds  = req.body.fabricantes;
     try {
         const fabricantes = await Fabricante.find({ _id: { $in: fabricanteIds } });
         if (fabricantes.length === 0) {
@@ -86,11 +86,14 @@ const crearProductoConFabricante =  async (req, res) => {
         if (!producto) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
         }
-        producto.fabricantes = fabricantes.map(fabricante => fabricante._id);
+        for (const fabricante of fabricantes) {
+            producto.fabricantes.push(fabricante);
+        }
         await producto.save();
-        return res.status(201).json({message: 'El fabricante fue asociado correctamente.', producto});
+        const productoActualizado = await Producto.findById(id);
+        return res.status(201).json({message: 'El fabricante fue asociado correctamente.', productoActualizado});
     } catch (error) {
-        console.log(error);
+        console.log('Martoo',error);
         return res.status(400).json({message:'Hubo un error al asociar el fabribante con el producto.'});
     }
 }
@@ -100,7 +103,7 @@ productoController.crearProductoConFabricante = crearProductoConFabricante;
 const obtenerFabricantesDeProducto = async (req, res) => {
     const id = req.params.id
     try {
-        const fabricantesDeProducto = await Producto.findById(id).populate('fabricantes')
+        const fabricantesDeProducto = await Producto.findById(id).select('-componentes').populate('fabricantes')
         if (!fabricantesDeProducto) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`})
         }
@@ -112,8 +115,8 @@ const obtenerFabricantesDeProducto = async (req, res) => {
 productoController.obtenerFabricantesDeProducto = obtenerFabricantesDeProducto;
 
 const crearProductoConComponentes =  async (req, res) => {
-    const { id } = req.params;
-    const { componentesIds } = req.body;
+    const id  = req.params.id;
+    const componentesIds = req.body.componentes;
     try {
         const componentes = await Componente.find({ _id: { $in: componentesIds } });
         if (componentes.length === 0) {
@@ -123,8 +126,12 @@ const crearProductoConComponentes =  async (req, res) => {
         if (!producto) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
         }
-        producto.componentes = componentes.map(componente => componente._id);
-        return res.status(201).json({message: 'El componente fue asociado correctamente.', producto});
+        for (const componente of componentes) {
+            producto.componentes.push(componente);
+        }
+        await producto.save();
+        const productoActualizado = await Producto.findById(id);
+        return res.status(201).json({message: 'El componente fue asociado correctamente.', productoActualizado});
     } catch (error) {
         return res.status(400).json({message:'Hubo un error al asociar el componente con el producto.'});
     }
@@ -135,7 +142,7 @@ productoController.crearProductoConComponentes = crearProductoConComponentes;
 const obtenerComponentesDeProducto = async (req, res) => {
     const id = req.params.id
     try {
-        const componentesDeProducto = await Producto.findById(id).populate('componentes');
+        const componentesDeProducto = await Producto.findById(id).select('-fabricantes').populate('componentes');
         if (!componentesDeProducto) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`})
         }
