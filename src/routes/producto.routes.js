@@ -7,7 +7,7 @@ const routes = Router();
 
 routes.get('/', productoController.obtenerProductos);
 routes.get('/:id', empresaValidate.validateId, productoController.obtenerProductoById);
-routes.post('/', empresaValidate.schemasValidator(productoSchemas), productoController.agregarProducto);
+routes.post('/', empresaValidate.schemasValidator(productoSchemas.creationSchema), productoController.agregarProducto);
 routes.put('/:id', empresaValidate.validateId, productoController.modificarProducto);
 routes.delete('/:id', empresaValidate.validateId, productoController.eliminarProducto);
 routes.post('/:id/fabricantes', empresaValidate.validateId, productoController.crearProductoConFabricante);

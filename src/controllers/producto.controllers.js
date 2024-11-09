@@ -1,146 +1,147 @@
 const Fabricante = require('../models/fabricante.model');
 const Componente = require('../models/componente.model');
+const Producto = require('../models/producto.model');
 
 const productoController = {};
 
-const obtenerProductos = async (request, response) => {
+const obtenerProductos = async (req, res) => {
     try {
         const productos = await Producto.find().select('-__v');
-        return response.status(200).json(productos);
+        return res.status(200).json(productos);
     } catch (error) {
-        return response.status(500).json({message: 'Hubo un error al obtener los productos.', messageError: error})
+        return res.status(500).json({message: 'Hubo un error al obtener los productos.', messageError: error})
     }
 }
 productoController.obtenerProductos = obtenerProductos;
 
-const obtenerProductoById = async (request, response) => {
-    const {id} = new mongoose.request.params;
+const obtenerProductoById = async (req, res) => {
+    const id = req.params.id;
     try {
-        const producto = await Producto.findByPk(id).select('-__v');
+        const producto = await Producto.findById(id).select('-__v');
         if (!producto) {
-            return response.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.` });
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.` });
         }        
-        return response.status(200).json(producto);
+        return res.status(200).json(producto);
     } catch (error) {
-        return response.status(404).json({message: 'Hubo un error al obtener el producto', messageError: error});
+        return res.status(404).json({message: 'Hubo un error al obtener el producto', messageError: error});
     }
 }
 productoController.obtenerProductoById = obtenerProductoById;
 
-const agregarProducto = async (request, response) => {
-    const datosProducto = request.body;
+const agregarProducto = async (req, res) => {
+    const datosProducto = req.body; 
     try {
-        const producto = await new Producto(datosProducto).save()
-        return response.status(201).json(producto);
+        const producto = await new Producto(datosProducto).save();
+        return res.status(201).json(producto);
     } catch (error) {
-        return response.status(400).json({message: 'Hubo un error al crear producto', messageError: error});
+        return res.status(400).json({message: 'Hubo un error al crear producto', messageError: error});
     }
 }
 productoController.agregarProducto = agregarProducto;
 
-const modificarProducto = async (request, response) => {
-    const id = request.params;
-    const datosProducto = request.body;
+const modificarProducto = async (req, res) => {
+    const id = req.params.id;
+    const datosProducto = req.body;
     try {
-        const obtenerProducto = await Producto.findByPk(id).select('-__v');
+        const obtenerProducto = await Producto.findById(id).select('-__v');
         if (!obtenerProducto) {
-            return response.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
         }
         await Producto.findByIdAndUpdate(
             id,
             datosProducto,
             { new: true, runValidators: true }
         );
-        const productoActualizado = await Producto.findByPk(id).select('-__v');
-        return response.status(200).json(productoActualizado);
+        const productoActualizado = await Producto.findById(id).select('-__v');
+        return res.status(200).json(productoActualizado);
     } catch (error) {
-        return response.status(404).json({message: 'Hubo un error al actualizar el producto', messageError: error});
+        return res.status(404).json({message: 'Hubo un error al actualizar el producto', messageError: error});
     }
 }
 productoController.modificarProducto = modificarProducto;
 
-const eliminarProducto = async (request, response) => {
-    const id = request.params;
+const eliminarProducto = async (req, res) => {
+    const id = req.params.id;
     try {
         const producto = await Producto.findByIdAndDelete(id);
         if(!producto){
-            response.status(404).json({message: 'El producto no existe'});
+            res.status(404).json({message: 'El producto no existe'});
         }
-        return response.status(200).json({message: `El producto fue con id: ${id} fue eliminado correctamente`})
+        return res.status(200).json({message: `El producto fue con id: ${id} fue eliminado correctamente`})
     } catch (error) {
-        return response.status(500).json({message: 'Hubo un error al eliminar el producto', messageError: error});
+        return res.status(500).json({message: 'Hubo un error al eliminar el producto', messageError: error});
     }
 }
 productoController.eliminarProducto = eliminarProducto;
 
-const crearProductoConFabricante =  async (request, response) => {
-    const { id } = request.params;
-    const { fabricanteIds } = request.body;
+const crearProductoConFabricante =  async (req, res) => {
+    const { id } = req.params;
+    const { fabricanteIds } = req.body;
     try {
         const fabricantes = await Fabricante.find({ _id: { $in: fabricanteIds } });
         if (fabricantes.length === 0) {
-            return response.status(404).json({ error: `El ID ${fabricanteId} no corresponde a ningún fabricante.`});
+            return res.status(404).json({ error: `El ID ${fabricanteId} no corresponde a ningún fabricante.`});
         }
         const producto = await Producto.findById(id);
         if (!producto) {
-            return response.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
         }
         producto.fabricantes = fabricantes.map(fabricante => fabricante._id);
         await producto.save();
-        return response.status(201).json({message: 'El fabricante fue asociado correctamente.', producto});
+        return res.status(201).json({message: 'El fabricante fue asociado correctamente.', producto});
     } catch (error) {
         console.log(error);
-        return response.status(400).json({message:'Hubo un error al asociar el fabribante con el producto.'});
+        return res.status(400).json({message:'Hubo un error al asociar el fabribante con el producto.'});
     }
 }
 
 productoController.crearProductoConFabricante = crearProductoConFabricante;
 
-const obtenerFabricantesDeProducto = async (request, response) => {
-    const id = request.params.id
+const obtenerFabricantesDeProducto = async (req, res) => {
+    const id = req.params.id
     try {
         const fabricantesDeProducto = await Producto.findById(id).populate('fabricantes')
         if (!fabricantesDeProducto) {
-            return response.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`})
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`})
         }
-        return response.status(200).json(fabricantesDeProducto)
+        return res.status(200).json(fabricantesDeProducto)
     } catch (error) {
-        return response.status(500).json({ error: 'Error obtener los productos del fabricante.'})
+        return res.status(500).json({ error: 'Error obtener los productos del fabricante.'})
     }
 }
 productoController.obtenerFabricantesDeProducto = obtenerFabricantesDeProducto;
 
-const crearProductoConComponentes =  async (request, response) => {
-    const { id } = request.params;
-    const { componentesIds } = request.body;
+const crearProductoConComponentes =  async (req, res) => {
+    const { id } = req.params;
+    const { componentesIds } = req.body;
     try {
         const componentes = await Componente.find({ _id: { $in: componentesIds } });
         if (componentes.length === 0) {
-            return response.status(404).json({ error: `El ID ${componentesIds} no corresponde a ningún componente.`});
+            return res.status(404).json({ error: `El ID ${componentesIds} no corresponde a ningún componente.`});
         }
         const producto = await Producto.findById(id);
         if (!producto) {
-            return response.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
         }
         producto.componentes = componentes.map(componente => componente._id);
-        return response.status(201).json({message: 'El componente fue asociado correctamente.', producto});
+        return res.status(201).json({message: 'El componente fue asociado correctamente.', producto});
     } catch (error) {
-        return response.status(400).json({message:'Hubo un error al asociar el componente con el producto.'});
+        return res.status(400).json({message:'Hubo un error al asociar el componente con el producto.'});
     }
 }
 
 productoController.crearProductoConComponentes = crearProductoConComponentes;
 
-const obtenerComponentesDeProducto = async (request, response) => {
-    const id = request.params.id
+const obtenerComponentesDeProducto = async (req, res) => {
+    const id = req.params.id
     try {
         const componentesDeProducto = await Producto.findById(id).populate('componentes');
         if (!componentesDeProducto) {
-            return response.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`})
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`})
         }
-        return response.status(200).json(componentesDeProducto)
+        return res.status(200).json(componentesDeProducto)
     } catch (error) {
-        return response.status(500).json({ error: 'Error obtener los productos del componente.'})
+        return res.status(500).json({ error: 'Error obtener los productos del componente.'})
     }
 }
 productoController.obtenerComponentesDeProducto = obtenerComponentesDeProducto;
