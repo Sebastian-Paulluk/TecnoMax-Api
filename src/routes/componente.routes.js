@@ -1,9 +1,8 @@
 const { Router } = require('express')
 const routes = Router()
-const componenteController = require('../controllers/componente.controller')
-const validateId = require('../middlewares/empresa.middleware')
+const componenteController = require('../controllers/componente.controllers')
+const empresaValidate = require('../middlewares/empresa.middleware')
 const componenteSchema = require('../schemas/componente.schema')
-const schemasValidator = require('../middlewares/schemasValidate.middlewares')
 
 routes.get
     (
@@ -12,27 +11,27 @@ routes.get
 
 routes.get
     (
-    '/:id', validateId, componenteController.obtenerComponente
+    '/:id', empresaValidate.validateId, componenteController.obtenerComponente
     )
 
 routes.post
     (
-    '/', schemasValidator(componenteSchema.creationSchema), componenteController.agregarComponente
+    '/', empresaValidate.schemasValidator(componenteSchema.creationSchema), componenteController.agregarComponente
     )
 
 routes.put
     (
-    '/:id', validateId, schemasValidator(componenteSchema.updateSchema), componenteController.actualizarComponente
+    '/:id', empresaValidate.validateId, empresaValidate.schemasValidator(componenteSchema.updateSchema), componenteController.actualizarComponente
     )
 
 routes.delete
     (
-    '/:id', validateId, componenteController.borrarComponente
+    '/:id', empresaValidate.validateId, componenteController.borrarComponente
     )
 
 routes.get
     (
-    '/:id/productos', validateId, componenteController.obtenerProductosDeComponente
+    '/:id/productos', empresaValidate.validateId, componenteController.obtenerProductosDeComponente
     )
 
 module.exports = routes
