@@ -34,4 +34,9 @@ routes.get
     '/:id/productos', empresaValidate.validateId, componenteController.obtenerProductosDeComponente
     )
 
+routes.post
+    (
+    '/:id/productos', empresaValidate.validateId, componenteController.crearComponenteConProducto
+    )
+
 module.exports = routes

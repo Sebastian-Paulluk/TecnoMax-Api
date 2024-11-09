@@ -1,5 +1,5 @@
 const Fabricante = require('../models/fabricante.model');
-
+const Producto = require('../models/producto.model');
 
 const obtenerFabricantes = async (req, res) => {
     try {
@@ -106,14 +106,36 @@ const obtenerProductosDeFabricante = async (req, res) => {
     }
 }
 
-
+const crearFabricanteConProducto =  async (req, res) => {
+    const  id  = req.params.id;
+    const productosIds  = req.body.productos;
+    try {
+        const productos = await Producto.find({ _id: { $in: productosIds } });
+        if (productos.length === 0) {
+            return res.status(404).json({ error: `El ID ${productosIds} no corresponde a ningún productos.`});
+        }
+        const fabricante = await Fabricante.findById(id);
+        if (!fabricante) {
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`});
+        }
+        for (const producto of productos) {
+            fabricante.productos.push(producto);
+        }
+        await fabricante.save();
+        const fabricanteActualizado = await Fabricante.findById(id);
+        return res.status(201).json({message: 'El fabricante fue asociado correctamente.', fabricanteActualizado});
+    } catch (error) {
+        return res.status(400).json({message:'Hubo un error al asociar el producto con el fabricante.'});
+    }
+}
 const fabricanteController = {
     obtenerFabricantes,
     obtenerFabricante,
     agregarFabricante,
     actualizarFabricante,
     borrarFabricante,
-    obtenerProductosDeFabricante
+    obtenerProductosDeFabricante,
+    crearFabricanteConProducto
 }
 
 

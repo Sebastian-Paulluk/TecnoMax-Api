@@ -27,5 +27,9 @@ routes.delete('/:id',
 routes.get('/:id/productos', 
     empresaValidate.validateId,
     fabricanteController.obtenerProductosDeFabricante)
+    
+routes.post('/:id/productos',
+    empresaValidate.validateId,
+    fabricanteController.crearFabricanteConProducto)
 
 module.exports = routes
