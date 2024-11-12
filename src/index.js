@@ -9,7 +9,6 @@ const app = express()
 app.use(express.json())
 app.use(routes)
 
-
 app.listen(PORT, async() => {
     await connectToDatabase()
     console.log(`Ejecutando servidor en puerto ${PORT}`)

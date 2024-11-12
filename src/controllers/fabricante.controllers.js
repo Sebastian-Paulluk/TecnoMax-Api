@@ -1,9 +1,13 @@
 const Fabricante = require('../models/fabricante.model');
 const Producto = require('../models/producto.model');
 
+
 const obtenerFabricantes = async (req, res) => {
     try {
-        const fabricantes = await Fabricante.find().select('-__v');
+        const fabricantes = await Fabricante
+            .find()
+            .select('-__v');
+
         res.status(200).json(fabricantes);
     } catch (error) {
         res.status(500).json({
@@ -17,7 +21,10 @@ const obtenerFabricantes = async (req, res) => {
 const obtenerFabricante = async (req, res) => {
     const id = req.params.id
     try {
-        const fabricante = await Fabricante.findById(id).select('-__v');
+        const fabricante = await Fabricante
+            .findById(id)
+            .select('-__v');
+
         if (!fabricante) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`});
         }
@@ -51,11 +58,13 @@ const actualizarFabricante = async (req, res) => {
     const datosActualizados = req.body;
 
     try {
-        const fabricanteActualizado = await Fabricante.findByIdAndUpdate(
-            id,
-            datosActualizados,
-            { new: true, runValidators: true }
-        );
+        const fabricanteActualizado = await Fabricante
+            .findByIdAndUpdate(
+                id,
+                datosActualizados,
+                { new: true, runValidators: true }
+            );
+
         if (!fabricanteActualizado) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`});
         }
@@ -106,6 +115,7 @@ const obtenerProductosDeFabricante = async (req, res) => {
     }
 }
 
+
 const crearFabricanteConProducto =  async (req, res) => {
     const  id  = req.params.id;
     const productosIds  = req.body.productos;
@@ -128,6 +138,8 @@ const crearFabricanteConProducto =  async (req, res) => {
         return res.status(400).json({message:'Hubo un error al asociar el producto con el fabricante.'});
     }
 }
+
+
 const fabricanteController = {
     obtenerFabricantes,
     obtenerFabricante,
