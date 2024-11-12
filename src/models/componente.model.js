@@ -16,7 +16,7 @@ const componenteSchema = new mongoose.Schema(
     productos: 
         [{
         type: Schema.Types.ObjectId,
-        ref: 'Producto'
+        ref: 'Producto',
         }]
     }, { versionKey: false })
 
