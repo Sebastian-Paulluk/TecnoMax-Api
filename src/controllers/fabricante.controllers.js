@@ -78,28 +78,7 @@ const actualizarFabricante = async (req, res) => {
 }
 
 
-const borrarFabricante = async (req, res) => {
-    const id = req.params.id;
-    try {
-        const fabricanteAEliminar = await Fabricante.findById(id);
-        
-        if (!fabricanteAEliminar) {
-            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`});
-        }
-        if (fabricanteAEliminar.productos.length > 0) {
-            return res.status(404).json({ error: `No se puede eliminar el fabricante porque tiene productos asociados.`});
-        }
-        
 
-        await Fabricante.findByIdAndDelete(id);
-        res.status(200).json({ message: `Fabricante eliminado con éxito.`});
-    } catch (error) {
-        res.status(500).json({
-            error: 'Error al eliminar el fabricante.',
-            detalles: error.message
-        });
-    } 
-}
 
 
 const obtenerProductosDeFabricante = async (req, res) => {
@@ -142,7 +121,10 @@ const crearFabricanteConProducto =  async (req, res) => {
         const fabricanteActualizado = await Fabricante.findById(id);
         return res.status(201).json({message: 'El fabricante fue asociado correctamente.', fabricanteActualizado});
     } catch (error) {
-        return res.status(400).json({message:'Hubo un error al asociar el producto con el fabricante.'});
+        return res.status(400).json({
+            error: 'Hubo un error al asociar el producto con el fabricante.',
+            detalles: error.message
+        });
     }
 }
 
@@ -159,9 +141,17 @@ const borrarRelacionesDeFabricante = async(req, res) => {
         fabricante.productos = [];
         await fabricante.save();
 
-        return res.status(201).json({message: 'Rereferncias del fabricante a productos eliminadas con éxito.'});
+        await Producto.updateMany(
+            { fabricantes: id },
+            { $pull: { fabricantes: id }}
+        )
+
+        return res.status(201).json({message: 'Referencias entre el fabricante y los productos eliminadas con éxito.'});
     } catch (error) {
-        return res.status(400).json({message:'Hubo un error al eliminar las referencias a productos del fabricante.'});
+        return res.status(400).json({
+            error: 'Hubo un error al eliminar las referencias a productos del fabricante.',
+            detalles: error.message
+        });
     }
 }
 
@@ -178,19 +168,56 @@ const borrarRelacionDeFabricanteConProducto = async(req, res) => {
             (prod) => prod.toString() === idProducto
         );
         if (indexProducto === -1) {
-            return res.status(404).json({ error: `Producto no encontrado para el fabricante especificado.` });
+            return res.status(404).json({ error: `Referencia del producto en fabricante no encontrada.` });
         }
-
+        
         fabricante.productos.splice(indexProducto, 1);
-
         await fabricante.save();
 
-        return res.status(201).json({message: 'Producto eliminado de la lista de productos del fabricante especificado.'});
+        await Producto.findByIdAndUpdate(
+            idProducto,
+            { $pull:{ fabricantes: idFabricante } },
+            { new: true }
+        )
+
+        return res.status(201).json({message: 'Referencias entre el fabricante y el producto eliminadas con éxito.'});
     } catch (error) {
-        return res.status(400).json({message:'Hubo un error al eliminar el producto de la lista de productos del fabricante especificado.'});
+        return res.status(400).json({
+            error:'Hubo un error al eliminar el producto de la lista de productos del fabricante especificado.',
+            detalles: error.message
+        });
     }
 }
 
+
+const borrarFabricante = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const fabricanteAEliminar = await Fabricante.findById(id);
+        
+        if (!fabricanteAEliminar) {
+            return res.status(404).json({
+                error: `El ID ${id} no corresponde a ningún fabricante.`
+            });
+        }
+
+        const productosAsociadosAlFabricante = fabricanteAEliminar.productos.length
+
+        if (productosAsociadosAlFabricante > 0) {
+            return res.status(404).json({
+                error: `No se puede eliminar el fabricante porque tiene ${productosAsociadosAlFabricante} productos asociados.`
+            });
+        }
+        
+        await Fabricante.findByIdAndDelete(id);
+        res.status(200).json({ message: `Fabricante eliminado con éxito.`});
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al eliminar el fabricante.',
+            detalles: error.message
+        });
+    } 
+}
 
 
 const fabricanteController = {
