@@ -1,12 +1,10 @@
 const Fabricante = require('../models/fabricante.model')
 const Producto = require('../models/producto.model')
-const Componente = require('../models/componente.model')
 
 async function seedDatabase() {
     try {
         await Fabricante.deleteMany({})
         await Producto.deleteMany({})
-        await Componente.deleteMany({})
 
         const fabricantes = await Fabricante.insertMany([
             {
@@ -16,101 +14,78 @@ async function seedDatabase() {
                 pathImgPerfil: 'ruta/a/la/imagen/lenovo'
             },
             {
-                nombre: 'Apple',
-                direccion: '120 Bremner Blvd.',
-                numeroContacto: '3438235091',
-            },
-            {
                 nombre: 'Samsung',
                 direccion: '2800 Market St, Irving',
                 numeroContacto: '7684320063',
                 pathImgPerfil: 'ruta/a/la/imagen/samsung'
             }
-        ])
+        ]);
 
         const productos = await Producto.insertMany([
             {
-                nombre: 'Notebook Lenovo Ideapad B550',
-                descripcion: 'Laptop Lenovo de 15.6" con procesador Intel Core i7 de 12ª generación, 16GB de RAM, y SSD de 480GB. Ideal para multitarea avanzada y rendimiento óptimo.',
-                precio: '2900000',
-                pathImg: 'ruta/a/la/imagen/'
+                nombre: 'Lenovo ThinkPad X1 Carbon',
+                descripcion: 'Notebook Lenovo de 14" con procesador Intel Core i7, 16GB RAM y SSD de 512GB.',
+                precio: 3200000,
+                pathImg: 'ruta/a/la/imagen/lenovo1.jpg',
+                fabricantes: [fabricantes[0]._id],
+                componentes: [
+                    { nombre: 'Motherboard Intel', descripcion: 'Placa base compatible con procesadores Intel de última generación' },
+                    { nombre: 'Microprocesador Intel Core i7', descripcion: 'Procesador Intel de alto rendimiento para tareas multitarea' },
+                    { nombre: 'Memoria RAM 16GB DDR4', descripcion: 'Memoria rápida para multitarea y alto rendimiento' },
+                    { nombre: 'SSD 512GB', descripcion: 'Unidad de estado sólido para almacenamiento rápido' },
+                    { nombre: 'Pantalla 14" FHD', descripcion: 'Pantalla de alta resolución, ideal para trabajo y entretenimiento' }
+                ]
             },
             {
-                nombre: 'iPhone 14 Pro Max',
-                descripcion: 'Smartphone de 6.7" con pantalla OLED, chip A16 Bionic, cámara triple de 48 MP, y 256 GB de almacenamiento.',
-                precio: '1950000',
-                pathImg: 'ruta/a/la/imagen/'
+                nombre: 'Lenovo Ideapad 3',
+                descripcion: 'Notebook Lenovo de 15.6" con procesador AMD Ryzen 5, 8GB RAM y SSD de 256GB.',
+                precio: 2500000,
+                pathImg: 'ruta/a/la/imagen/lenovo2.jpg',
+                fabricantes: [fabricantes[0]._id],
+                componentes: [
+                    { nombre: 'Motherboard AMD', descripcion: 'Placa base compatible con procesadores AMD Ryzen' },
+                    { nombre: 'Microprocesador AMD Ryzen 5', descripcion: 'Procesador AMD para rendimiento eficiente' },
+                    { nombre: 'Memoria RAM 8GB DDR4', descripcion: 'Memoria rápida para tareas cotidianas y aplicaciones de oficina' },
+                    { nombre: 'SSD 256GB', descripcion: 'Unidad de estado sólido para almacenamiento eficiente' },
+                    { nombre: 'Pantalla 15.6" HD', descripcion: 'Pantalla HD para una visualización clara y precisa' }
+                ]
             },
             {
-                nombre: 'Galaxy Tab S8+',
-                descripcion: 'Tableta de 12.4" con pantalla Super AMOLED, procesador Snapdragon 8 Gen 1, 8 GB de RAM y 256 GB de almacenamiento.',
-                precio: '3150000',
-                pathImg: 'ruta/a/la/imagen/'
+                nombre: 'Samsung Galaxy Book Flex',
+                descripcion: 'Notebook Samsung de 13.3" con Intel Core i5, 8GB RAM y SSD de 256GB.',
+                precio: 2800000,
+                pathImg: 'ruta/a/la/imagen/samsung1.jpg',
+                fabricantes: [fabricantes[1]._id],
+                componentes: [
+                    { nombre: 'Motherboard Intel', descripcion: 'Placa base compatible con procesadores Intel de última generación' },
+                    { nombre: 'Microprocesador Intel Core i7', descripcion: 'Procesador Intel de alto rendimiento para tareas multitarea' },
+                    { nombre: 'Memoria RAM 16GB DDR4', descripcion: 'Memoria rápida para multitarea y alto rendimiento' },
+                    { nombre: 'SSD 256GB', descripcion: 'Unidad de estado sólido para almacenamiento eficiente' },
+                    { nombre: 'Pantalla 14" FHD', descripcion: 'Pantalla de alta resolución, ideal para trabajo y entretenimiento' }
+                ]
+            },
+            {
+                nombre: 'Samsung Notebook Odyssey',
+                descripcion: 'Notebook Samsung de 15.6" con Intel Core i7, 16GB RAM y SSD de 1TB.',
+                precio: 4000000,
+                pathImg: 'ruta/a/la/imagen/samsung2.jpg',
+                fabricantes: [fabricantes[1]._id],
+                componentes: [
+                    { nombre: 'Motherboard Intel', descripcion: 'Placa base compatible con procesadores Intel de última generación' },
+                    { nombre: 'Microprocesador Intel Core i7', descripcion: 'Procesador Intel de alto rendimiento para tareas multitarea' },
+                    { nombre: 'Memoria RAM 16GB DDR4', descripcion: 'Memoria rápida para multitarea y alto rendimiento' },
+                    { nombre: 'SSD 512GB', descripcion: 'Unidad de estado sólido para almacenamiento rápido' },
+                    { nombre: 'Pantalla 15.6" HD', descripcion: 'Pantalla HD para una visualización clara y precisa' }
+                ]
             }
-        ])
+        ]);
 
-        const componentes = await Componente.insertMany(
-            [
-                {
-                    nombre: 'Procesador Intel Core i7 de 12ª generación',
-                    descripcion: 'Procesador potente para tareas exigentes y rendimiento multitarea'
-                },
-                {
-                    nombre: 'Memoria RAM de 16GB DDR4',
-                    descripcion: 'Memoria rápida y eficiente que permite ejecutar múltiples aplicaciones sin interrupciones'
-                },
-                {
-                    nombre: 'Chip A16 Bionic',
-                    descripcion: 'Procesador de última generación diseñado por Apple, ofrece un rendimiento rápido y eficiente'
-                },
-                {
-                    nombre: 'Pantalla Super Retina XDR',
-                    descripcion: 'Pantalla OLED de 6.7 pulgadas con alta resolución y colores vibrantes'
-                },
-                {
-                    nombre: 'Pantalla Super AMOLED de 12.4 pulgadas',
-                    descripcion: 'Pantalla nítida y vibrante, ideal para ver contenido multimedia y trabajar con precisión'
-                },
-                {
-                    nombre: 'Procesador Snapdragon 8 Gen 1',
-                    descripcion: 'Procesador rápido y eficiente que permite realizar múltiples tareas sin problemas'
-                }
-            ])
-
-            const relaciones = [
-                {   
-                    fabricante: fabricantes[0],
-                    producto: productos[0], // Lenovo Notebook
-                    componentes: [componentes[0], componentes[1]] 
-                }, 
-                { 
-                    fabricante: fabricantes[1],
-                    producto: productos[1], // iPhone 14 Pro Max
-                    componentes: [componentes[2], componentes[3]]
-                }, 
-                { 
-                    fabricante: fabricantes[2],
-                    producto: productos[2], // Galaxy Tab S8+
-                    componentes: [componentes[4], componentes[5]] 
-                }  
-            ];
-
-
-            for (const { fabricante, producto, componentes } of relaciones) {
-                fabricante.productos.push(producto._id);
-                await fabricante.save();
-
-                producto.fabricantes.push(fabricante._id);
-                await producto.save();
-
-                producto.componentes = componentes;  
-                await producto.save();
-
-                for (const componente of componentes) {
-                    componente.productos.push(producto._id);
-                    await componente.save(); 
-                }
-            }
+        fabricantes[0].productos.push(productos[0]._id)
+        fabricantes[0].productos.push(productos[1]._id)
+        fabricantes[1].productos.push(productos[2]._id)
+        fabricantes[1].productos.push(productos[3]._id)
+        await fabricantes[0].save()
+        await fabricantes[1].save()
 
         console.log('Base de datos poblada con éxito.')
 
