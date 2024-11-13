@@ -81,10 +81,17 @@ const actualizarFabricante = async (req, res) => {
 const borrarFabricante = async (req, res) => {
     const id = req.params.id;
     try {
-        const fabricanteEliminado = await Fabricante.findByIdAndDelete(id);
-        if (!fabricanteEliminado) {
+        const fabricanteAEliminar = await Fabricante.findById(id);
+        
+        if (!fabricanteAEliminar) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`});
         }
+        if (fabricanteAEliminar.productos.length > 0) {
+            return res.status(404).json({ error: `No se puede eliminar el fabricante porque tiene productos asociados.`});
+        }
+        
+
+        await Fabricante.findByIdAndDelete(id);
         res.status(200).json({ message: `Fabricante eliminado con éxito.`});
     } catch (error) {
         res.status(500).json({
@@ -140,6 +147,52 @@ const crearFabricanteConProducto =  async (req, res) => {
 }
 
 
+const borrarRelacionesDeFabricante = async(req, res) => {
+    const id = req.params.id;
+    try {
+        const fabricante = await Fabricante.findById(id);
+        
+        if (!fabricante) {
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`});
+        }
+
+        fabricante.productos = [];
+        await fabricante.save();
+
+        return res.status(201).json({message: 'Rereferncias del fabricante a productos eliminadas con éxito.'});
+    } catch (error) {
+        return res.status(400).json({message:'Hubo un error al eliminar las referencias a productos del fabricante.'});
+    }
+}
+
+
+const borrarRelacionDeFabricanteConProducto = async(req, res) => {
+    const {idFabricante, idProducto} = req.params
+    try {
+        const fabricante = await Fabricante.findById(idFabricante);
+        if (!fabricante) {
+            return res.status(404).json({ error: `El ID no corresponde a ningún fabricante.`});
+        }
+
+        const indexProducto = fabricante.productos.findIndex(
+            (prod) => prod.toString() === idProducto
+        );
+        if (indexProducto === -1) {
+            return res.status(404).json({ error: `Producto no encontrado para el fabricante especificado.` });
+        }
+
+        fabricante.productos.splice(indexProducto, 1);
+
+        await fabricante.save();
+
+        return res.status(201).json({message: 'Producto eliminado de la lista de productos del fabricante especificado.'});
+    } catch (error) {
+        return res.status(400).json({message:'Hubo un error al eliminar el producto de la lista de productos del fabricante especificado.'});
+    }
+}
+
+
+
 const fabricanteController = {
     obtenerFabricantes,
     obtenerFabricante,
@@ -147,7 +200,9 @@ const fabricanteController = {
     actualizarFabricante,
     borrarFabricante,
     obtenerProductosDeFabricante,
-    crearFabricanteConProducto
+    crearFabricanteConProducto,
+    borrarRelacionesDeFabricante,
+    borrarRelacionDeFabricanteConProducto
 }
 
 

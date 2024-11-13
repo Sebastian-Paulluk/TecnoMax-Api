@@ -1,12 +1,14 @@
 const idSchema = require('../schemas/id.schema');
 
-const validateId = (req, res, next) => {
-    const { error } = idSchema.validate(req.params.id)
+const validateId = (paramName = 'id') => (req, res, next) => {
+    const { error } = idSchema.validate(req.params[paramName]);
     if (error) {
-        return res.status(400).json({ error: error.message })
+        return res.status(400).json({ error: error.message });
     }
     next();
-}
+};
+
+
 const schemasValidator = (schema) => {
     return (request,response,next) => {
         const resultado = schema.validate(request.body, {abortEarly:false})
@@ -21,6 +23,7 @@ const schemasValidator = (schema) => {
         next();
     }
 }
+
 const empresaValidate = {
     validateId,
     schemasValidator

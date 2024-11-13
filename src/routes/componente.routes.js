@@ -11,7 +11,7 @@ routes.get
 
 routes.get
     (
-    '/:id', empresaValidate.validateId, componenteController.obtenerComponente
+    '/:id', empresaValidate.validateId(), componenteController.obtenerComponente
     )
 
 routes.post
@@ -21,22 +21,22 @@ routes.post
 
 routes.put
     (
-    '/:id', empresaValidate.validateId, empresaValidate.schemasValidator(componenteSchema.updateSchema), componenteController.actualizarComponente
+    '/:id', empresaValidate.validateId(), empresaValidate.schemasValidator(componenteSchema.updateSchema), componenteController.actualizarComponente
     )
 
 routes.delete
     (
-    '/:id', empresaValidate.validateId, componenteController.borrarComponente
+    '/:id', empresaValidate.validateId(), componenteController.borrarComponente
     )
 
 routes.get
     (
-    '/:id/productos', empresaValidate.validateId, componenteController.obtenerProductosDeComponente
+    '/:id/productos', empresaValidate.validateId(), componenteController.obtenerProductosDeComponente
     )
 
 routes.post
     (
-    '/:id/productos', empresaValidate.validateId, componenteController.crearComponenteConProducto
+    '/:id/productos', empresaValidate.validateId(), componenteController.crearComponenteConProducto
     )
 
 module.exports = routes

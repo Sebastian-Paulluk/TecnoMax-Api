@@ -5,31 +5,49 @@ const fabricanteController = require('../controllers/fabricante.controllers')
 const fabricanteSchema = require('../schemas/fabricante.schema')
 
 routes.get('/',
-    fabricanteController.obtenerFabricantes)
+    fabricanteController.obtenerFabricantes
+);
 
 routes.get('/:id',
-    empresaValidate.validateId,
-    fabricanteController.obtenerFabricante)
+    empresaValidate.validateId(),
+    fabricanteController.obtenerFabricante
+);
 
 routes.post('/',
     empresaValidate.schemasValidator(fabricanteSchema.creationSchema),
-    fabricanteController.agregarFabricante)
+    fabricanteController.agregarFabricante
+);
 
 routes.put('/:id', 
-    empresaValidate.validateId,
+    empresaValidate.validateId(),
     empresaValidate.schemasValidator(fabricanteSchema.updateSchema),
-    fabricanteController.actualizarFabricante)
+    fabricanteController.actualizarFabricante
+);
 
 routes.delete('/:id',
-    empresaValidate.validateId,
-    fabricanteController.borrarFabricante)
+    empresaValidate.validateId(),
+    fabricanteController.borrarFabricante
+);
 
 routes.get('/:id/productos', 
-    empresaValidate.validateId,
-    fabricanteController.obtenerProductosDeFabricante)
+    empresaValidate.validateId(),
+    fabricanteController.obtenerProductosDeFabricante
+);
     
 routes.post('/:id/productos',
-    empresaValidate.validateId,
-    fabricanteController.crearFabricanteConProducto)
+    empresaValidate.validateId(),
+    fabricanteController.crearFabricanteConProducto
+);   
+
+routes.delete('/:id/productos',
+    empresaValidate.validateId(),
+    fabricanteController.borrarRelacionesDeFabricante
+);   
+ 
+routes.delete('/:idFabricante/productos/:idProducto',
+    empresaValidate.validateId('idFabricante'),
+    empresaValidate.validateId('idProducto'),
+    fabricanteController.borrarRelacionDeFabricanteConProducto
+);
 
 module.exports = routes
