@@ -2,6 +2,7 @@ const { Router } = require('express');
 const empresaValidate = require('../middlewares/empresa.middleware')
 const productoController = require('../controllers/producto.controllers');
 const productoSchemas = require('../schemas/producto.schema');
+const componenteSchema = require('../schemas/componente.schema')
 
 const routes = Router();
 

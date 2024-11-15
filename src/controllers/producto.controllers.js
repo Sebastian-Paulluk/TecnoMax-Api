@@ -1,5 +1,4 @@
 const Fabricante = require('../models/fabricante.model');
-const Componente = require('../models/componente.model');
 const Producto = require('../models/producto.model');
 
 const productoController = {};
