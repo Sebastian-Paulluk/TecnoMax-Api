@@ -194,11 +194,7 @@ const eliminarComponenteDeProducto = async (req, res) => {
         if (!componente) {
             return res.status(404).json({ error: `El ID ${idComponente} no corresponde a ningún componente en el producto.` });
         }
-
-        // el metodo remove() no funciona en subdocumentos, hay que usar pull()
-        //producto.componentes.pull(idComponente);
-        componente.remove();
-
+        producto.componentes.pull(idComponente);
         await producto.save();
         return res.status(200).json({ message: 'Componente eliminado con éxito.', producto });
     } catch (error) {

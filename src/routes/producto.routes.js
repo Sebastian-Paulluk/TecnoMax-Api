@@ -14,14 +14,11 @@ routes.delete('/:id', empresaValidate.validateId(), productoController.eliminarP
 routes.post('/:id/fabricantes', empresaValidate.validateId(), productoController.crearProductoConFabricante);
 routes.get('/:id/fabricantes', empresaValidate.validateId(), productoController.obtenerFabricantesDeProducto);
 
-// validar 2 ids por separado: empresaValidate.validateId('idProducto'),empresaValidate.validateId('idComponente')
-// post (creacion): tambien tienen que usar el schema para validar el tipo de dato, longitud, etc. ya que se estan insertando datos.
-
 routes.get('/:id/componentes', empresaValidate.validateId(), productoController.obtenerComponentesDeProducto);
-routes.get('/:idProducto/componentes/:idComponente', empresaValidate.validateId(), productoController.obtenerComponenteDeProducto);
-routes.post('/:id/componentes', empresaValidate.validateId(), productoController.agregarComponenteAProducto);
-routes.put('/:idProducto/componentes/:idComponente', empresaValidate.validateId(), empresaValidate.schemasValidator(componenteSchema.updateSchema), productoController.modificarComponenteDeProducto);
-routes.delete('/:idProducto/componentes/:idComponente', empresaValidate.validateId(), productoController.eliminarComponenteDeProducto);
+routes.get('/:idProducto/componentes/:idComponente', empresaValidate.validateId('idProducto'),empresaValidate.validateId('idComponente'), productoController.obtenerComponenteDeProducto);
+routes.post('/:id/componentes', empresaValidate.validateId(), empresaValidate.schemasValidator(componenteSchema.updateSchema), productoController.agregarComponenteAProducto);
+routes.put('/:idProducto/componentes/:idComponente', empresaValidate.validateId('idProducto'),empresaValidate.validateId('idComponente'), empresaValidate.schemasValidator(componenteSchema.updateSchema), productoController.modificarComponenteDeProducto);
+routes.delete('/:idProducto/componentes/:idComponente', empresaValidate.validateId('idProducto'),empresaValidate.validateId('idComponente'), productoController.eliminarComponenteDeProducto);
 
 //EN DUDA DE SI SIRVE O NO:
 routes.get('/componentes/:idComponente/productos', empresaValidate.validateId(), productoController.obtenerProductosDeComponente);
