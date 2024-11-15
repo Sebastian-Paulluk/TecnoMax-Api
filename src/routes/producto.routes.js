@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const empresaValidate = require('../middlewares/empresa.middleware')
+const empresaValidate = require('../middleware/empresa.middleware')
 const productoController = require('../controllers/producto.controllers');
 const productoSchemas = require('../schemas/producto.schema');
 const componenteSchema = require('../schemas/componente.schema')
@@ -13,6 +13,9 @@ routes.put('/:id', empresaValidate.validateId, productoController.modificarProdu
 routes.delete('/:id', empresaValidate.validateId(), productoController.eliminarProducto);
 routes.post('/:id/fabricantes', empresaValidate.validateId(), productoController.crearProductoConFabricante);
 routes.get('/:id/fabricantes', empresaValidate.validateId(), productoController.obtenerFabricantesDeProducto);
+
+// validar 2 ids por separado: empresaValidate.validateId('idProducto'),empresaValidate.validateId('idComponente')
+// post (creacion): tambien tienen que usar el schema para validar el tipo de dato, longitud, etc. ya que se estan insertando datos.
 
 routes.get('/:id/componentes', empresaValidate.validateId(), productoController.obtenerComponentesDeProducto);
 routes.get('/:idProducto/componentes/:idComponente', empresaValidate.validateId(), productoController.obtenerComponenteDeProducto);

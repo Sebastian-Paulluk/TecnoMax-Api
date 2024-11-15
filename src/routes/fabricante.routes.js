@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const routes = Router()
-const empresaValidate = require('../middlewares/empresa.middleware')
+const empresaValidate = require('../middleware/empresa.middleware')
 const fabricanteController = require('../controllers/fabricante.controllers')
 const fabricanteSchema = require('../schemas/fabricante.schema')
 
@@ -26,28 +26,28 @@ routes.put('/:id',
 
 routes.delete('/:id',
     empresaValidate.validateId(),
-    fabricanteController.borrarFabricante
+    fabricanteController.eliminarFabricante
 );
 
 routes.get('/:id/productos', 
     empresaValidate.validateId(),
     fabricanteController.obtenerProductosDeFabricante
 );
-    
+
 routes.post('/:id/productos',
     empresaValidate.validateId(),
-    fabricanteController.crearFabricanteConProducto
+    fabricanteController.asociarFabricanteConProductos
 );   
 
 routes.delete('/:id/productos',
     empresaValidate.validateId(),
-    fabricanteController.borrarRelacionesDeFabricante
+    fabricanteController.eliminarAsociacionesDeFabricante
 );   
  
 routes.delete('/:idFabricante/productos/:idProducto',
     empresaValidate.validateId('idFabricante'),
     empresaValidate.validateId('idProducto'),
-    fabricanteController.borrarRelacionDeFabricanteConProducto
+    fabricanteController.desasociarFabricanteConProducto
 );
 
 module.exports = routes

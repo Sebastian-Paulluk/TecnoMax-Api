@@ -102,34 +102,45 @@ const obtenerProductosDeFabricante = async (req, res) => {
 }
 
 
-const crearFabricanteConProducto =  async (req, res) => {
-    const  id  = req.params.id;
-    const productosIds  = req.body.productos;
+const asociarFabricanteConProductos =  async (req, res) => {
+    const idFabricante  = req.params.id;
+    const idsProductos  = req.body.productos;
+
     try {
-        const productos = await Producto.find({ _id: { $in: productosIds } });
-        if (productos.length === 0) {
-            return res.status(404).json({ error: `El ID ${productosIds} no corresponde a ningún productos.`});
-        }
-        const fabricante = await Fabricante.findById(id);
+        const fabricante = await Fabricante.findById(idFabricante);
         if (!fabricante) {
-            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún fabricante.`});
+            return res.status(404).json({ error: `El ID no corresponde a ningún fabricante.`});
         }
+
+        const productos = await Producto.find({ _id: { $in: idsProductos } });
+        if (productos.length === 0) {
+            return res.status(404).json({ error: `El(los) ID('s) no corresponde(n) a ninguno de los productos.`});
+        }
+
         for (const producto of productos) {
-            fabricante.productos.push(producto);
+            if (!fabricante.productos.includes(producto._id)) {
+                fabricante.productos.push(producto._id);
+            }
+
+            if(!producto.fabricantes.includes(idFabricante)) {
+                producto.fabricantes.push(fabricante._id);
+                await producto.save();
+            }
         }
+        
         await fabricante.save();
-        const fabricanteActualizado = await Fabricante.findById(id);
-        return res.status(201).json({message: 'El fabricante fue asociado correctamente.', fabricanteActualizado});
+
+        return res.status(201).json({message: 'Asociación entre el fabricante y el(los) producto(s) creada con éxito.'});
     } catch (error) {
         return res.status(400).json({
-            error: 'Hubo un error al asociar el producto con el fabricante.',
+            error: 'Hubo un error al asociar el(los) producto(s) con el fabricante.',
             detalles: error.message
         });
     }
 }
 
 
-const borrarRelacionesDeFabricante = async(req, res) => {
+const eliminarAsociacionesDeFabricante = async(req, res) => {
     const id = req.params.id;
     try {
         const fabricante = await Fabricante.findById(id);
@@ -156,7 +167,7 @@ const borrarRelacionesDeFabricante = async(req, res) => {
 }
 
 
-const borrarRelacionDeFabricanteConProducto = async(req, res) => {
+const desasociarFabricanteConProducto = async(req, res) => {
     const {idFabricante, idProducto} = req.params
     try {
         const fabricante = await Fabricante.findById(idFabricante);
@@ -190,7 +201,7 @@ const borrarRelacionDeFabricanteConProducto = async(req, res) => {
 }
 
 
-const borrarFabricante = async (req, res) => {
+const eliminarFabricante = async (req, res) => {
     const id = req.params.id;
     try {
         const fabricanteAEliminar = await Fabricante.findById(id);
@@ -225,11 +236,11 @@ const fabricanteController = {
     obtenerFabricante,
     agregarFabricante,
     actualizarFabricante,
-    borrarFabricante,
+    eliminarFabricante,
     obtenerProductosDeFabricante,
-    crearFabricanteConProducto,
-    borrarRelacionesDeFabricante,
-    borrarRelacionDeFabricanteConProducto
+    asociarFabricanteConProductos,
+    eliminarAsociacionesDeFabricante,
+    desasociarFabricanteConProducto
 }
 
 
