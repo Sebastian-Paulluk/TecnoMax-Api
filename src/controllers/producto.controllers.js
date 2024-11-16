@@ -62,10 +62,20 @@ productoController.modificarProducto = modificarProducto;
 const eliminarProducto = async (req, res) => {
     const id = req.params.id;
     try {
-        const producto = await Producto.findByIdAndDelete(id);
-        if(!producto){
+        const productoAEliminar = await Producto.findById(id);
+        if(!productoAEliminar){
             res.status(404).json({message: 'El producto no existe'});
         }
+        
+        const fabricantessAsociadosAlProducto = producto.fabricantes.length;
+        
+        if (fabricantessAsociadosAlProducto > 0) {
+            return res.status(404).json({
+                error: `No se puede eliminar el producto porque tiene ${fabricantessAsociadosAlProducto} fabricantes asociados.`
+            });
+        }
+
+        await Producto.findByIdAndDelete(id);
         return res.status(200).json({message: `El producto fue con id: ${id} fue eliminado correctamente`})
     } catch (error) {
         return res.status(500).json({message: 'Hubo un error al eliminar el producto', messageError: error});
@@ -73,31 +83,99 @@ const eliminarProducto = async (req, res) => {
 }
 productoController.eliminarProducto = eliminarProducto;
 
-const crearProductoConFabricante =  async (req, res) => {
+const asociarProductoConFabricantes =  async (req, res) => {
     const  id  = req.params.id;
     const fabricanteIds  = req.body.fabricantes;
     try {
-        const fabricantes = await Fabricante.find({ _id: { $in: fabricanteIds } });
-        if (fabricantes.length === 0) {
-            return res.status(404).json({ error: `El ID ${fabricanteId} no corresponde a ningún fabricante.`});
-        }
         const producto = await Producto.findById(id);
         if (!producto) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
         }
+        const fabricantes = await Fabricante.find({ _id: { $in: fabricanteIds } });
+        if (fabricantes.length === 0) {
+            return res.status(404).json({ error: `El ID ${fabricanteId} no corresponde a ningún fabricante.`});
+        }
         for (const fabricante of fabricantes) {
-            producto.fabricantes.push(fabricante);
+            if(!producto.fabricantes.includes(fabricante._id)){
+                producto.fabricantes.push(fabricante._id);
+            }
+            if (!fabricante.productos.includes(producto._id)) {
+                fabricante.productos.push(producto._id);
+            }
+            await fabricantes.save();
         }
         await producto.save();
-        const productoActualizado = await Producto.findById(id);
-        return res.status(201).json({message: 'El fabricante fue asociado correctamente.', productoActualizado});
+        
+        return res.status(201).json({message: 'Asociación entre el producto y los fabricantes creada con éxito.'});
     } catch (error) {
-        console.log('Martoo',error);
         return res.status(400).json({message:'Hubo un error al asociar el fabribante con el producto.'});
     }
 }
 
-productoController.crearProductoConFabricante = crearProductoConFabricante;
+productoController.asociarProductoConFabricantes = asociarProductoConFabricantes;
+
+const eliminarAsociacionesDeProducto = async(req, res) => {
+    const id = req.params.id;
+    try {
+        const producto = await Producto.findById(id);
+        
+        if (!producto) {
+            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
+        }
+
+        producto.fabricantes = [];
+        await fabricante.save();
+
+        await Fabricante.updateMany(
+            { productos: id },
+            { $pull: { productos: id }}
+        )
+
+        return res.status(201).json({message: 'Referencias entre el producto y los fabricantes eliminadas con éxito.'});
+    } catch (error) {
+        return res.status(400).json({
+            error: 'Hubo un error al eliminar las referencias a productos del fabricante.',
+            detalles: error.message
+        });
+    }
+}
+
+productoController.eliminarAsociacionesDeProducto = eliminarAsociacionesDeProducto;
+
+const desasociarProductoConFabricante = async(req, res) => {
+    const {idFabricante, idProducto} = req.params
+    try {
+        const producto = await Producto.findById(idProducto);
+        if (!producto) {
+            return res.status(404).json({ error: `El ID no corresponde a ningún producto.`});
+        }
+
+        const indexFabricante = producto.fabricantes.findIndex(
+            (fabricante) => fabricante.toString() === idFabricante
+        );
+        if (indexFabricante === -1) {
+            return res.status(404).json({ error: `Referencia del fabricante en producto no encontrada.` });
+        }
+        
+        producto.fabricantes.splice(indexFabricante, 1);
+        await producto.save();
+        
+        await Fabricante.findByIdAndUpdate(
+            idFabricante,
+            { $pull:{ productos: idProducto } },
+            { new: true }
+        )
+
+        return res.status(201).json({message: 'Referencias entre el producto y el fabricante eliminadas con éxito.'});
+    } catch (error) {
+        return res.status(400).json({
+            error:'Hubo un error al eliminar el producto de la lista de productos del fabricante especificado.',
+            detalles: error.message
+        });
+    }
+}
+
+productoController.desasociarProductoConFabricante = desasociarProductoConFabricante;
 
 const obtenerFabricantesDeProducto = async (req, res) => {
     const id = req.params.id
@@ -215,32 +293,8 @@ const obtenerProductosDeComponente = async (req, res) => {
         return res.status(500).json({ error: 'Error al obtener los productos del componente.', detalles: error.message });
     }
 };
+
 productoController.obtenerProductosDeComponente = obtenerProductosDeComponente;
 
-//ESTA NO SE SI DEBERIA SEGUIR ESTANDO:
-const crearProductoConComponentes =  async (req, res) => {
-    const id  = req.params.id;
-    const componentesIds = req.body.componentes;
-    try {
-        const componentes = await Componente.find({ _id: { $in: componentesIds } });
-        if (componentes.length === 0) {
-            return res.status(404).json({ error: `El ID ${componentesIds} no corresponde a ningún componente.`});
-        }
-        const producto = await Producto.findById(id);
-        if (!producto) {
-            return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`});
-        }
-        for (const componente of componentes) {
-            producto.componentes.push(componente);
-        }
-        await producto.save();
-        const productoActualizado = await Producto.findById(id);
-        return res.status(201).json({message: 'El componente fue asociado correctamente.', productoActualizado});
-    } catch (error) {
-        return res.status(400).json({message:'Hubo un error al asociar el componente con el producto.'});
-    }
-}
-
-productoController.crearProductoConComponentes = crearProductoConComponentes;
-
 module.exports = productoController;
+
