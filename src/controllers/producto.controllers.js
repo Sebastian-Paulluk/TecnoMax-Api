@@ -67,7 +67,7 @@ const eliminarProducto = async (req, res) => {
             res.status(404).json({message: 'El producto no existe'});
         }
         
-        const fabricantessAsociadosAlProducto = producto.fabricantes.length;
+        const fabricantessAsociadosAlProducto = productoAEliminar.fabricantes.length;
         
         if (fabricantessAsociadosAlProducto > 0) {
             return res.status(404).json({
@@ -102,12 +102,13 @@ const asociarProductoConFabricantes =  async (req, res) => {
             if (!fabricante.productos.includes(producto._id)) {
                 fabricante.productos.push(producto._id);
             }
-            await fabricantes.save();
+            await fabricante.save();
         }
         await producto.save();
         
         return res.status(201).json({message: 'Asociación entre el producto y los fabricantes creada con éxito.'});
     } catch (error) {
+        console.log(error)
         return res.status(400).json({message:'Hubo un error al asociar el fabribante con el producto.'});
     }
 }
@@ -124,7 +125,7 @@ const eliminarAsociacionesDeProducto = async(req, res) => {
         }
 
         producto.fabricantes = [];
-        await fabricante.save();
+        await producto.save();
 
         await Fabricante.updateMany(
             { productos: id },
@@ -175,12 +176,17 @@ const desasociarProductoConFabricante = async(req, res) => {
     }
 }
 
+
 productoController.desasociarProductoConFabricante = desasociarProductoConFabricante;
 
 const obtenerFabricantesDeProducto = async (req, res) => {
     const id = req.params.id
     try {
-        const fabricantesDeProducto = await Producto.findById(id).select('-componentes').populate('fabricantes')
+        const fabricantesDeProducto = await Producto
+            .findById(id)
+            .select('-componentes')
+            .populate('fabricantes')
+
         if (!fabricantesDeProducto) {
             return res.status(404).json({ error: `El ID ${id} no corresponde a ningún producto.`})
         }

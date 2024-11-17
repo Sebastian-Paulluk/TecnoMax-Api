@@ -12,10 +12,9 @@ app.use(routes)
 app.listen(PORT, async() => {
     await connectToDatabase()
 
-    if (process.env.SEEDER === 'true') {
+    if (process.env.RUN_SEEDER === 'true') {
         await seedDatabase()
     }
     
     console.log(`Ejecutando servidor en puerto ${PORT}`)
-
 })
