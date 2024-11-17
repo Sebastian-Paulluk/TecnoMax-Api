@@ -2,19 +2,20 @@ const express = require('express')
 const connectToDatabase = require('./db/mongo.db')
 const seedDatabase = require('./utils/seedDatabase')
 const routes  = require('./routes/index')
-const PORT = process.env.PORT ?? 3000;
 require('dotenv').config()
+const PORT = process.env.API_PORT ?? 3000;
 
 const app = express()
 app.use(express.json())
 app.use(routes)
 
+
 app.listen(PORT, async() => {
     await connectToDatabase()
-
+    
     if (process.env.RUN_SEEDER === 'true') {
         await seedDatabase()
     }
-    
+
     console.log(`Ejecutando servidor en puerto ${PORT}`)
 })
