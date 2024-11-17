@@ -6,7 +6,7 @@ const productoController = {};
 const obtenerProductos = async (req, res) => {
     try {
         const productos = await Producto.find().select('-__v');
-        return res.status(200).json(productos);
+        return res.status(200).json(productos.length > 0 ? productos : {message: 'La lista de productos está vacía'});
     } catch (error) {
         return res.status(500).json({message: 'Hubo un error al obtener los productos.', messageError: error})
     }

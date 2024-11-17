@@ -21,14 +21,14 @@ services:
       ME_CONFIG_MONGODB_URL: ${MONGO_URL}
       ME_CONFIG_BASICAUTH: false
 
-  # empresa: 
-  #   image: empresa-image:1.0.0
-  #   ports:
-  #     - 3000:3000
-  #   environment:
-  #     PORT: ${PORT}
-  #     MONGO_URL: ${MONGO_URL}
-  #     MONGO_USER: ${MONGO_USER}
-  #     MONGO_PASSWORD: ${MONGO_PASSWORD}
-  #   depends_on:
-  #     - mongodb
+  empresa: 
+    image: empresa-image:1.0.0
+    ports:
+      - 3000:3000
+    environment:
+      PORT: ${PORT}
+      MONGO_URL: ${MONGO_URL}
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+    depends_on:
+      - mongodb

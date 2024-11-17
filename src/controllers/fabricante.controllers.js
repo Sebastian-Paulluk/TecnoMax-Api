@@ -8,7 +8,7 @@ const obtenerFabricantes = async (req, res) => {
             .find()
             .select('-__v');
 
-        res.status(200).json(fabricantes);
+        res.status(200).json(fabricantes.length > 0 ? fabricantes : {message: 'La lista de fabricantes está vacía'});
     } catch (error) {
         res.status(500).json({
             error: 'Error al obtener los fabricantes.',
