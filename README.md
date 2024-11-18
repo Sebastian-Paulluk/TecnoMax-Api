@@ -1,233 +1,70 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/QBnwEJ5z)
 # Estrategias de Persistencia - TP 2024 - Documental
 
-Este trabajo práctico tiene como objetivo principal que los alumnos adquieran experiencia práctica en la implementación de las relaciones entre documentos en contexto de una API REST utilizando un ODM (Object-document mapping).
+## Tabla de Contenidos
 
-Uno de los criterios que se tiende a confundir es el término de bases de datos NoSQL con la ausencia de relaciones, pero la verdad es que muchas de las bases de datos NoSQL ya nos ofrecen funcionalidades que nos permiten tener cierto grado de relación entre los datos.
-
-# Enfoques de relaciones en MongoDB
-
-Las relaciones en MongoDB se pueden modelar en 2 enfoques diferentes: la relación incrustada o relación referenciada. La elección de estos enfoques dependerá del tipo de casuística a abordar y decisiones de modelamiento de datos.
-
-## Relación incrustada
-
-Relación que implica almacenar documentos secundarios incrustados dentro de un documento principal.
-
-![Incrustada](./img/Incrustada.png)
-
-## Relaciones referenciadas
-
-Práctica de almacenar manualmente el campo \_id de un documento relacionado como referencia en otro documento. Esto implica que el desarrollador es responsable de mantener la coherencia de las referencias y realizar las consultas necesarias para obtener los detalles completos de los documentos relacionados.
-
-![Referenciada](./img/Referenciada.png)
-
-- API REST:
-  Una API REST (Representational State Transfer) es un conjunto de reglas y convenciones para la creación de servicios web que permiten la comunicación entre sistemas. En este trabajo práctico, utilizaremos una API REST para exponer recursos y permitir operaciones CRUD (Create, Read, Update, Delete) sobre estos recursos.
-
-- Enfoque Práctico:
-  Los alumnos implementarán las relaciones ustilizando el enfoque que considen conveniente en cada caso en el contexto de una API REST utilizando un ODM específico, Mongoose. Se espera que los alumnos comprendan cómo definir modelos, establecer relaciones entre ellos y utilizar las capacidades del ODM para interactuar con la base de datos documental.
-
-- Criterios de Evaluación:
-  Se evaluará la precisión y completitud en la implementación de las asociaciones en la API REST, así como la funcionalidad completa del CRUD para los recursos expuestos por la API.
+- [Descripción del Proyecto](#descripción-del-Proyecto)
+- [Diagrama Entidad-Relacion](#diagrama-entidad-relación)
+- [Descripción del modelo DER](#descripción-del-modelo-DER)
+- [Uso y ejecución de la aplicación](#uso-y-ejecución-de-la-aplicación)
+- [Fundamentación de las relaciones](#fundamentación-de-las-relaciones)
+- [Rutas de la API](#rutas-de-la-api)
+- [Estructura del Proyecto](#estructura-del-proyecto)
 
 ## Descripción del Proyecto
 
 Han sido contratados/as por una empresa de manufactura para desarrollar un sistema interno de gestión de productos. La empresa fabrica una amplia gama de productos tecnológicos que requieren componentes específicos y son producidos por múltiples fabricantes asociados. Actualmente, el proceso de gestión de esta información es manual y está descentralizado, lo que genera demoras y problemas en la producción. La empresa busca automatizar y centralizar estos datos mediante un sistema web eficiente que permita gestionar los productos, fabricantes y componentes de manera integrada.
 
-## Modelo Documental a implementar
+## Diagrama Entidad-Relación
 
-Basandose en el siguiente diagrama de entidad-relacion (DER) utilizado para una base de datos relacional deberán deberán migrarlo a una base documental utilizando los críterios que consideren conveniente en cada caso. Relación Incrustada o Rleación Referenciada.
+![Diagrama Entidad-Relación del proyecto](./img/DER.png)
 
-![DER](./img/DER.png)
-
-### Descripción del modelo DER
+## Descripción del modelo DER
 
 - Un **Producto** puede tener muchos fabricantes, y un **Fabricante** puede fabricar muchos productos.
 - Un **Producto** puede tener muchos componentes, y un **Componente** puede formar parte de varios productos.
 
-### Base de datos
+## Uso y ejecución de la aplicación
 
-El motor de base de datos a utilizar deberá ser **Mongo DB**. Se recomeniendo utilizar el archivo docker compose incluido en este proyecto para que puedan instanciar el motor de base de datos y un cliente del mismo para consultar las colecciones de forma dockerizada.
+Seguí estos pasos para ejecutar el proyecto:
 
-### Intalacion de dependencias
+1. Teniendo [Docker desktop](https://www.docker.com/products/docker-desktop/) instalado, ejecutalo.
 
-Debera contar con las dependencias de produccion y desarrollo necesarias de un proyecto node. Por ejemplo:
+2. Para crear una imagen de la aplicación y versionarla con Docker, debés ubicarte en la raíz del proyecto y ejecutar el siguiente comando:
 
-`npm i mongoose express`
+    ```docker build -t empresa-image:1.0.0 .```
 
-`npm i -D nodemon`
+3. Ahora, para poder correr la apliación en un contendor de Docker, ejecutá el siguiente comando:
 
-### Tips - Conexión a un base de datos
+    ```docker-compose up -d```
 
-```
-const mongoose = require('mongoose')
-const MONGO_URL = process.env.MONGO_URL || 'mongodb://admin:admin1234@localhost:27017/seriesMongo?authSource=admin'
-async function connectToDatabase() {
-    try {
-        mongoose.set('strictQuery', false);
-        await mongoose.connect(MONGO_URL);
-        console.log('Conexión a mongo con éxito');
-    } catch (err) {
-        console.error('Error al conectarse a mongo', err);
-    }
-}
+¡Y listo! Ahora, sin ser obligatorio, pero a modo de recomendación para que la ejecución de la aplicación sea mas amena, te aconsejamos ir hacia el archivo ```.env``` que está ubicado en la raíz del proyecto y modificar la variable ```RUN_SEEDER``` a ```false``` , por defecto, se encuentra en ```true``` . 
 
-module.exports = {connectToDatabase, mongoose}
-```
+Esto permitirá que, al ejecutar la aplicación por primera vez, se pueble la base de datos ( ```RUN_SEEDER=true``` ), pero una vez que nos pongamos a hacer pruebas, lo desactivemos ( ```RUN_SEEDER=false``` ) para que cuando la herramienta Nodemon reinicie el servidor de nuestra aplicación, no se vuelva a poblar la base de datos, cambiando así, los ID de los elementos del modelo.
 
-- Ejemplo de como generar un modelo simple
+## Fundamentación de las relaciones
 
-```
-const mongoose = require('./db').mongoose;
 
-const seriesSchema = new mongoose.Schema({
-    titulo: {
-        type: String,
-        required: true,
-    },
-    temporada: {
-        type: Number,
-        required: true,
-    },
-    genero: {
-        type: String,
-    },
-    capitulos: [{
-        titulo: { type: String, required: true },  // Título del capítulo
-        duracion: { type: Number },  // Duración en minutos
-        numero: { type: Number },  // Número de capítulo en la temporada
-        descripcion: { type: String }  // Breve descripción del capítulo
-    }]
-});
 
-const Series = mongoose.model('Series', seriesSchema);
+## Rutas de la API
 
-module.exports = Series;
-```
+Acá tenés una lista de las rutas del proyecto listas para probar en tu herramienta de API:
 
-## API
+### Productos
 
-Implementar la API utilizando el framework express en el entorde de ejecucion de un poryecto NodeJs. Organizar el código en rutas, controlers y middleware utilizando la separación por recurso. A continuación se detallan los endpoinds que deberán estar disponbiles en la API.
+### Resumen
 
-| Verbo  | Recurso                    | Status code   | Descripción                                           |
-| ------ | -------------------------- | ------------- | ----------------------------------------------------- |
-| GET    | /productos                 | 200           | Obtener todos los productos                           |
-| GET    | /productos/:id             | 200, 404      | Obtener un producto en particular                     |
-| POST   | /productos                 | 201, 400      | Crear un producto                                     |
-| PUT    | /productos/:id             | 200, 404      | Modificar los datos de un producto en particular      |
-| DELETE | /productos/:id             | 200, 404, 500 | Borrar un producto en particular                      |
-| POST   | /productos/:id/fabricantes | 201, 404, 400 | Crear la asociación de producto con 1 o N fabricantes |
-| GET    | /productos/:id/fabricantes | 200, 404      | Obtener todos los fabricantes de un producto          |
-| POST   | /productos/:id/componentes | 201, 404, 400 | Crear la asociación de producto con 1 o N componentes |
-| GET    | /productos/:id/componentes | 200, 404      | Obtener todos los componentes de un producto          |
-| GET    | /fabricantes               | 200           | Obtener todos los fabricantes                         |
-| GET    | /fabricantes/:id           | 200, 404      | Obtener un fabricante en particular                   |
-| POST   | /fabricantes               | 201, 400      | Crear un fabricante                                   |
-| PUT    | /fabricantes/:id           | 200, 404      | Modificar los datos de un fabricante en particular    |
-| DELETE | /fabricantes/:id           | 200, 404, 500 | Borrar un fabricante en particular                    |
-| GET    | /fabricantes/:id/productos | 200, 404      | Obtener todos los productos de un fabricante          |
-| GET    | /componentes               | 200           | Obtener todos los componentes                         |
-| GET    | /componentes/:id           | 200, 404      | Obtener un componente en particular                   |
-| POST   | /componentes               | 201, 400      | Crear un componente                                   |
-| PUT    | /componentes/:id           | 200, 404      | Modificar los datos de un componente en particular    |
-| DELETE | /componentes/:id           | 200, 404, 500 | Borrar un componente en particular                    |
-| GET    | /componentes/:id/productos | 200, 404      | Obtener todos los productos de un componente          |
+### Fabricantes
 
-## Ejemplos
+### Resumen
 
-A modo de ejemplo se muestra el resultado de algunas respuesta de los endpoind detallado en la tabla de la sección anterior.
+### Componentes
 
-Recurso: **_/fabricantes/1/productos_**
+### Resumen
 
-Obtiene los datos del fabricante registrado con el id 1, con todos los productos que fabrica, incluyendo los atributos de cada producto y los componentes asociados a esos productos.
+## Estructura del Proyecto
+
+Explicación breve de la estructura del proyecto y la función de cada directorio:
 
 ```
-{
-    "id": 1,
-    "nombre": "TechCorp",
-    "direccion": "1234 Elm St, Ciudad",
-    "contacto": "+123456789",
-    "pathImgPerfil": "/images/fabricantes/techcorp.jpg",
-    "productos": [
-        {
-            "id": 1,
-            "nombre": "Laptop X200",
-            "descripcion": "Una laptop de alto rendimiento",
-            "precio": 1200.99,
-            "pathImg": "/images/productos/laptop-x200.jpg",
-            "componentes": [
-                {
-                    "id": 1,
-                    "nombre": "Procesador Intel i7",
-                    "descripcion": "Procesador de octava generación"
-                },
-                {
-                    "id": 2,
-                    "nombre": "SSD 1TB",
-                    "descripcion": "Disco sólido de 1TB de capacidad"
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "nombre": "Smartphone S5",
-            "descripcion": "Teléfono inteligente con pantalla OLED",
-            "precio": 799.99,
-            "pathImg": "/images/productos/smartphone-s5.jpg",
-            "componentes": [
-                {
-                    "id": 3,
-                    "nombre": "Pantalla OLED 6.5 pulgadas",
-                    "descripcion": "Pantalla de alta definición"
-                },
-                {
-                    "id": 4,
-                    "nombre": "Batería 4000mAh",
-                    "descripcion": "Batería de larga duración"
-                }
-            ]
-        }
-    ]
-}
-```
-
-Recurso: **_/productos/1/fabricantes_**
-
-Obtiene los datos del producto registrado con el id 1, con todos los fabricantes que lo producen, incluyendo los atributos de cada fabricante.
 
 ```
-{
-    "id": 1,
-    "nombre": "Laptop X200",
-    "descripcion": "Una laptop de alto rendimiento",
-    "precio": 1200.99,
-    "pathImg": "/images/productos/laptop-x200.jpg",
-    "fabricantes": [
-        {
-            "id": 1,
-            "nombre": "TechCorp",
-            "direccion": "1234 Elm St, Ciudad",
-            "contacto": "+123456789",
-            "pathImgPerfil": "/images/fabricantes/techcorp.jpg"
-        },
-        {
-            "id": 2,
-            "nombre": "Innovatech",
-            "direccion": "4567 Oak Ave, Ciudad",
-            "contacto": "+987654321",
-            "pathImgPerfil": "/images/fabricantes/innovatech.jpg"
-        }
-    ]
-}
-```
-
-## Consideraciones Finales sobre la Entrega
-
-- Deberán fundamentar las decisiones tomadas respecto de enfoque utilizado en cada relación dentro del archvivo README.md
-- El equipo debera entegar un repositorio de github con todas las instrucciones necesarias para correr la api.
-- Deberán detallar los commandos necesarios para la instalación y ejecución de la api.
-- El puerto de listener deberá ser configurable por variable de entorno
-
-## BONUS
-
-- Investigar como dockerizar la aplicación en node, es decir, generar una imagen de su aplicacion, versionarla y luego poder por a correr la apliación en un contendor.
