@@ -49,14 +49,16 @@ argumentar las relaciones de este proyecto de la siguiente forma:
 ### Relación embebida/incrustada | Productos con Componentes
 
 Los componentes de un producto serán siempre los mismos, entonces, tiene 
-sentido que estén incrustados/enbebidos en los productos como un 
+sentido que estén incrustados/embebidos en los productos como un 
 array de los mismos. No hay necesidad de que exista un componente sin un 
-producto, por su relación intrinseca dada por el ciclo de vida que comparten.
+producto, por su relación intrínseca dada por el ciclo de vida que comparten.
 
 ### Relación referenciada | Fabricantes con Productos
 
-Los Fabricantes y los Productos son ciclos de vida independientes entre si,
-ya que cada uno de ellos puede existir independientemente del otro.
+Los Fabricantes y los Productos son ciclos de vida independientes entre si, por lo tanto, 
+ambos pueden ser relacionados mediante referencia, ya que cada uno de ellos puede existir 
+independientemente del otro. Si yo elimino un Fabricante, no habría interferencias con los 
+Productos y viceversa. 
 
 ## Rutas de la API
 
