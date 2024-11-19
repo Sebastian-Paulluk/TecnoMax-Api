@@ -8,7 +8,6 @@
 - [Uso y ejecución de la aplicación](#uso-y-ejecución-de-la-aplicación)
 - [Fundamentación de las relaciones](#fundamentación-de-las-relaciones)
 - [Rutas de la API](#rutas-de-la-api)
-- [Estructura del Proyecto](#estructura-del-proyecto)
 
 ## Descripción del Proyecto
 
