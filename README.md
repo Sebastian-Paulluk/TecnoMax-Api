@@ -262,3 +262,9 @@ Acá tenés una lista de las rutas del proyecto listas para probar en tu herrami
 7. Asociar productos a un fabricante: POST ```http://localhost:3001/fabricantes/:id/productos```
 8. Eliminar todas las asociaciones de productos de un fabricante: DELETE ```http://localhost:3001/fabricantes/:id/productos```
 9. Desasociar un producto específico de un fabricante: DELETE ```http://localhost:3001/fabricantes/:idFabricante/productos/:idProducto```
+
+- Modificaciones pendientes del tp:
+    - Los metodos PUT deben usar ```replaceOne()``` en lugar de ```findByIdAndUpdate()```
+    - Respetar correctamente el ciclo de vida del proyecto basandonos en el 10
+    - Agregar ```mongo_data``` a ```.dockerignore```
+    - Revisar el ```readme``` luego de los cambios y agregar la estructura del proyecto
