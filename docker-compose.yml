@@ -21,8 +21,8 @@ services:
       ME_CONFIG_MONGODB_URL: ${MONGO_URL}
       ME_CONFIG_BASICAUTH: false
 
-  empresa: 
-    image: empresa-image:1.0.0
+  tecnomax: 
+    image: tecnomax-image:1.0.0
     ports:
       - ${HOST_PORT}:${API_PORT}
     environment:

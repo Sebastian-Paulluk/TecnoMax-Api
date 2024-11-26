@@ -30,7 +30,7 @@ Seguí estos pasos para ejecutar el proyecto:
 
 2. Para crear una imagen de la aplicación y versionarla con Docker, debés ubicarte en la raíz del proyecto y ejecutar el siguiente comando:
 
-    ```docker build -t empresa-image:1.0.0 .```
+    ```docker build -t tecnomax-image:1.0.0 .```
 
 3. Ahora, para poder correr la apliación en un contendor de Docker, ejecutá el siguiente comando:
 
