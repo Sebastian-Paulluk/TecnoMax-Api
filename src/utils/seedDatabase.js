@@ -94,4 +94,5 @@ async function seedDatabase() {
     }
 }
 
+
 module.exports = seedDatabase
