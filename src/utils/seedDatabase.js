@@ -11,13 +11,13 @@ async function seedDatabase() {
                 nombre: 'Lenovo',
                 direccion: 'Avenida del Libertador 7208',
                 numeroContacto: '1145670933',
-                pathImgPerfil: 'ruta/a/la/imagen/lenovo'
+                pathImgPerfil: 'https://res.cloudinary.com/dyyczibe4/image/upload/v1732708014/Logo_Lenovo_z5cib1.png'
             },
             {
                 nombre: 'Samsung',
                 direccion: '2800 Market St, Irving',
                 numeroContacto: '7684320063',
-                pathImgPerfil: 'ruta/a/la/imagen/samsung'
+                pathImgPerfil: 'https://res.cloudinary.com/dyyczibe4/image/upload/v1732708015/logo_samsung_ahqcke.png'
             }
         ]);
 
